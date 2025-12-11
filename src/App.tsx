@@ -59,6 +59,30 @@ const animals: AnimalOption[] = [
     basePrice: 32,
     accent: "#ef5350",
     emoji: "🐉"
+  },
+  {
+    id: "otter",
+    name: "River Otter",
+    description: "Playful, curious, and always exploring.",
+    basePrice: 23,
+    accent: "#7dcfb6",
+    emoji: "🦦"
+  },
+  {
+    id: "owl",
+    name: "Night Owl",
+    description: "Wise, watchful, and serene.",
+    basePrice: 25,
+    accent: "#c5cae9",
+    emoji: "🦉"
+  },
+  {
+    id: "tiger",
+    name: "Ember Tiger",
+    description: "Fierce focus with fiery energy.",
+    basePrice: 30,
+    accent: "#ff7043",
+    emoji: "🐯"
   }
 ];
 
