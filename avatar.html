@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Avatar Creator</title>
+    <style>
+        /* --- GENERAL LAYOUT --- */
+        :root {
+            --bg-color: #f0f4f8;
+            --panel-bg: #ffffff;
+            --primary: #4a90e2;
+            --accent: #2ecc71;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            display: flex;
+            width: 800px;
+            height: 550px;
+            background: var(--panel-bg);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* --- LEFT PANEL: PREVIEW --- */
+        .preview-panel {
+            flex: 1;
+            background-color: #e3e8ef;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        h2 { margin-top: 0; color: #333; }
+        h3 { font-size: 0.9rem; text-transform: uppercase; color: #888; margin-bottom: 10px; }
+
+        /* THE STAGE */
+        .avatar-stage {
+            width: 320px;
+            height: 320px;
+            position: relative; /* Crucial: Creates context for absolute layers */
+            background: white;
+            border-radius: 50%;
+            border: 8px solid white;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.05), 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* THE LAYERS (Stacked Images) */
+        .layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Allows clicks to pass through if needed */
+            transition: all 0.3s ease;
+        }
+
+        /* --- RIGHT PANEL: CONTROLS --- */
+        .controls-panel {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            border-left: 1px solid #eee;
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 20px;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .download-btn {
+            width: 100%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-weight: bold;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .download-btn:hover { background-color: #27ae60; }
+
+        /* --- CSS ART ASSETS (Placeholders for real images) --- */
+        
+        /* 1. ANIMAL BASES */
+        .base-bear {
+            background: #8d6e63;
+            border-radius: 50% 50% 45% 45%;
+            transform: scale(0.65) translateY(40px);
+        }
+        /* Adding ears to the bear using pseudo-elements */
+        .base-bear::before, .base-bear::after {
+            content: ''; position: absolute; top: 0; width: 80px; height: 80px;
+            background: #6d4c41; border-radius: 50%; z-index: -1;
+        }
+        .base-bear::before { left: -20px; }
+        .base-bear::after { right: -20px; }
+
+        .base-cat {
+            background: #ffcc80;
+            border-radius: 40% 40% 50% 50%;
+            transform: scale(0.6) translateY(50px);
+        }
+        /* Cat ears */
+        .base-cat::before, .base-cat::after {
+            content: ''; position: absolute; top: -30px; width: 0; height: 0;
+            border-left: 40px solid transparent;
+            border-right: 40px solid transparent;
+            border-bottom: 80px solid #ef6c00;
+        }
+        .base-cat::before { left: 0; transform: rotate(-20deg); }
+        .base-cat::after { right: 0; transform: rotate(20deg); }
+
+        .base-bunny {
+            background: #f5f5f5;
+            border-radius: 50%;
+            transform: scale(0.6) translateY(50px);
+        }
+        /* Bunny ears */
+        .base-bunny::before, .base-bunny::after {
+            content: ''; position: absolute; top: -120px; width: 50px; height: 160px;
+            background: #f5f5f5; border-radius: 50px; border: 4px solid #eee;
+        }
+        .base-bunny::before { left: 40px; transform: rotate(-10deg); }
+        .base-bunny::after { right: 40px; transform: rotate(10deg); }
+
+
+        /* 2. EYES */
+        .eyes-normal::before, .eyes-normal::after {
+            content: ''; position: absolute; top: 45%; width: 20px; height: 20px;
+            background: #333; border-radius: 50%; animation: blink 4s infinite;
+        }
+        .eyes-normal::before { left: 38%; }
+        .eyes-normal::after { right: 38%; }
+
+        .eyes-sleepy::before, .eyes-sleepy::after {
+            content: ''; position: absolute; top: 46%; width: 24px; height: 6px;
+            background: #333; border-radius: 10px;
+        }
+        .eyes-sleepy::before { left: 38%; }
+        .eyes-sleepy::after { right: 38%; }
+
+        /* 3. MOUTH */
+        .mouth-smile::after {
+            content: ''; position: absolute; top: 52%; left: 50%; transform: translateX(-50%);
+            width: 30px; height: 15px; border-bottom: 4px solid #333; border-radius: 0 0 20px 20px;
+        }
+        .mouth-frown::after {
+            content: ''; position: absolute; top: 58%; left: 50%; transform: translateX(-50%);
+            width: 20px; height: 4px; background: #333;
+        }
+
+        /* 4. ACCESSORIES */
+        .access-glasses::before {
+            content: ''; position: absolute; top: 43%; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 40px; border: 4px solid #333; border-radius: 10px;
+        }
+        .access-sun::before {
+            content: ''; position: absolute; top: 43%; left: 50%; transform: translateX(-50%);
+            width: 120px; height: 40px; background: #333; border-radius: 10px; opacity: 0.8;
+        }
+
+        @keyframes blink {
+            0%, 96%, 100% { transform: scaleY(1); }
+            98% { transform: scaleY(0.1); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="preview-panel">
+            <h2>Avatar Preview</h2>
+            <div id="avatar-stage" class="avatar-stage">
+                <div id="layer-base" class="layer base-bear"></div>
+                <div id="layer-eyes" class="layer eyes-normal"></div>
+                <div id="layer-mouth" class="layer mouth-smile"></div>
+                <div id="layer-access" class="layer"></div>
+            </div>
+        </div>
+
+        <div class="controls-panel">
+            <h2>Customize</h2>
+            
+            <div class="control-group">
+                <h3>1. Animal Base</h3>
+                <div class="button-grid">
+                    <button onclick="updateLayer('base', 'base-bear')">Bear</button>
+                    <button onclick="updateLayer('base', 'base-cat')">Cat</button>
+                    <button onclick="updateLayer('base', 'base-bunny')">Bunny</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>2. Eyes</h3>
+                <div class="button-grid">
+                    <button onclick="updateLayer('eyes', 'eyes-normal')">Normal</button>
+                    <button onclick="updateLayer('eyes', 'eyes-sleepy')">Sleepy</button>
+                    <button onclick="updateLayer('eyes', '')">None</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>3. Mouth</h3>
+                <div class="button-grid">
+                    <button onclick="updateLayer('mouth', 'mouth-smile')">Smile</button>
+                    <button onclick="updateLayer('mouth', 'mouth-frown')">Serious</button>
+                    <button onclick="updateLayer('mouth', '')">None</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>4. Accessories</h3>
+                <div class="button-grid">
+                    <button onclick="updateLayer('access', 'access-glasses')">Glasses</button>
+                    <button onclick="updateLayer('access', 'access-sun')">Shades</button>
+                    <button onclick="updateLayer('access', '')">None</button>
+                </div>
+            </div>
+
+            <button class="download-btn" onclick="downloadAvatar()">Download Avatar</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to switch layer classes
+        function updateLayer(layerId, className) {
+            const element = document.getElementById(`layer-${layerId}`);
+            
+            // Reset to base layer class then add the modifier
+            element.className = 'layer'; 
+            
+            if (className) {
+                element.classList.add(className);
+            }
+        }
+
+        // Placeholder for download functionality
+        function downloadAvatar() {
+            // Note: Real downloading requires 'html2canvas' library to take a screenshot of the div
+            alert("To make this button work, you would typically use a library like 'html2canvas' to take a screenshot of the .avatar-stage div!");
+        }
+    </script>
+</body>
+</html>
