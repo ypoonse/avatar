@@ -46,6 +46,30 @@ const animals: AnimalOption[] = [
     basePrice: 22,
     accent: "#673ab7",
     emoji: "🐱"
+  },
+  {
+    id: "panda",
+    name: "Zen Panda",
+    description: "Calm focus with playful spirit.",
+    basePrice: 26,
+    accent: "#b0bec5",
+    emoji: "🐼"
+  },
+  {
+    id: "wolf",
+    name: "Lunar Wolf",
+    description: "Loyal, swift, and determined.",
+    basePrice: 27,
+    accent: "#90caf9",
+    emoji: "🐺"
+  },
+  {
+    id: "dragon",
+    name: "Sky Dragon",
+    description: "Majestic, bold, and legendary.",
+    basePrice: 32,
+    accent: "#ef5350",
+    emoji: "🐉"
   }
 ];
 
