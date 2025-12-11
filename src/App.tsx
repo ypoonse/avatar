@@ -1,26 +1,15 @@
 import { useMemo, useState } from "react";
+import ChooseAnimal from "./pages/ChooseAnimal";
+import CustomizeAvatar from "./pages/CustomizeAvatar";
+import ReviewAvatar from "./pages/ReviewAvatar";
+import {
+  AnimalOption,
+  AvatarConfig,
+  ColorOption,
+  PricedOption
+} from "./types";
 
 type Step = "choose" | "customize" | "review";
-
-type AnimalOption = {
-  id: string;
-  name: string;
-  description: string;
-  basePrice: number;
-  accent: string;
-  emoji: string;
-};
-
-type ColorOption = { id: string; name: string; hex: string };
-type PricedOption = { id: string; name: string; priceDelta: number };
-
-type AvatarConfig = {
-  color: ColorOption["id"];
-  eyes: PricedOption["id"];
-  body: PricedOption["id"];
-  tail: PricedOption["id"];
-  accessory: PricedOption["id"];
-};
 
 const animals: AnimalOption[] = [
   {
@@ -198,6 +187,7 @@ function App() {
               animals={animals}
               selectedId={selectedAnimalId}
               onSelect={(id) => setSelectedAnimalId(id)}
+              formatCurrency={currency}
             />
           )}
 
@@ -206,6 +196,12 @@ function App() {
               config={activeConfig}
               onChange={updateConfig}
               animal={selectedAnimal}
+              colorOptions={colorOptions}
+              eyesOptions={eyesOptions}
+              bodyOptions={bodyOptions}
+              tailOptions={tailOptions}
+              accessoryOptions={accessoryOptions}
+              formatCurrency={currency}
             />
           )}
 
@@ -214,6 +210,12 @@ function App() {
               animal={selectedAnimal}
               config={activeConfig}
               totalPrice={totalPrice}
+              eyesOptions={eyesOptions}
+              bodyOptions={bodyOptions}
+              tailOptions={tailOptions}
+              accessoryOptions={accessoryOptions}
+              formatCurrency={currency}
+              findOption={findOption}
             />
           )}
         </section>
@@ -265,203 +267,6 @@ function App() {
           )}
         </div>
       </footer>
-    </div>
-  );
-}
-
-type ChooseAnimalProps = {
-  animals: AnimalOption[];
-  selectedId: string | null;
-  onSelect: (id: string) => void;
-};
-
-function ChooseAnimal({ animals, selectedId, onSelect }: ChooseAnimalProps) {
-  return (
-    <div className="grid">
-      {animals.map((animal) => (
-        <button
-          key={animal.id}
-          className={`card ${selectedId === animal.id ? "card-selected" : ""}`}
-          onClick={() => onSelect(animal.id)}
-        >
-          <div className="card-emoji" style={{ background: animal.accent }}>
-            <span>{animal.emoji}</span>
-          </div>
-          <div className="card-body">
-            <div className="card-title">
-              <h3>{animal.name}</h3>
-              <span className="pill">{currency(animal.basePrice)}</span>
-            </div>
-            <p className="muted">{animal.description}</p>
-          </div>
-        </button>
-      ))}
-    </div>
-  );
-}
-
-type CustomizeProps = {
-  animal: AnimalOption;
-  config: AvatarConfig;
-  onChange: <K extends keyof AvatarConfig>(
-    key: K,
-    value: AvatarConfig[K]
-  ) => void;
-};
-
-function OptionChips<T extends { id: string; name: string } & Partial<PricedOption>>({
-  options,
-  activeId,
-  onSelect
-}: {
-  options: T[];
-  activeId: string;
-  onSelect: (id: string) => void;
-}) {
-  return (
-    <div className="chips">
-      {options.map((opt) => (
-        <button
-          key={opt.id}
-          className={`chip ${activeId === opt.id ? "chip-active" : ""}`}
-          onClick={() => onSelect(opt.id)}
-        >
-          <span>{opt.name}</span>
-          {"priceDelta" in opt && opt.priceDelta !== undefined && opt.priceDelta > 0 && (
-            <span className="chip-price">+{currency(opt.priceDelta)}</span>
-          )}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function CustomizeAvatar({ config, onChange, animal }: CustomizeProps) {
-  return (
-    <div className="form">
-      <p className="eyebrow">Configuring</p>
-      <h2>{animal.name}</h2>
-
-      <label className="field">
-        <div className="field-head">
-          <span>Color</span>
-        </div>
-        <div className="swatches">
-          {colorOptions.map((color) => (
-            <button
-              key={color.id}
-              className={`swatch ${
-                config.color === color.id ? "swatch-active" : ""
-              }`}
-              style={{ background: color.hex }}
-              onClick={() => onChange("color", color.id)}
-              title={color.name}
-            />
-          ))}
-        </div>
-      </label>
-
-      <label className="field">
-        <div className="field-head">
-          <span>Eyes</span>
-        </div>
-        <OptionChips
-          options={eyesOptions}
-          activeId={config.eyes}
-          onSelect={(id) => onChange("eyes", id)}
-        />
-      </label>
-
-      <label className="field">
-        <div className="field-head">
-          <span>Body</span>
-        </div>
-        <OptionChips
-          options={bodyOptions}
-          activeId={config.body}
-          onSelect={(id) => onChange("body", id)}
-        />
-      </label>
-
-      <label className="field">
-        <div className="field-head">
-          <span>Tail</span>
-        </div>
-        <OptionChips
-          options={tailOptions}
-          activeId={config.tail}
-          onSelect={(id) => onChange("tail", id)}
-        />
-      </label>
-
-      <label className="field">
-        <div className="field-head">
-          <span>Accessory</span>
-        </div>
-        <OptionChips
-          options={accessoryOptions}
-          activeId={config.accessory}
-          onSelect={(id) => onChange("accessory", id)}
-        />
-      </label>
-    </div>
-  );
-}
-
-type ReviewProps = {
-  animal: AnimalOption;
-  config: AvatarConfig;
-  totalPrice: number;
-};
-
-function ReviewAvatar({ animal, config, totalPrice }: ReviewProps) {
-  const rows = [
-    { label: "Animal", value: animal.name, price: animal.basePrice },
-    {
-      label: "Eyes",
-      value: findOption(eyesOptions, config.eyes).name,
-      price: findOption(eyesOptions, config.eyes).priceDelta
-    },
-    {
-      label: "Body",
-      value: findOption(bodyOptions, config.body).name,
-      price: findOption(bodyOptions, config.body).priceDelta
-    },
-    {
-      label: "Tail",
-      value: findOption(tailOptions, config.tail).name,
-      price: findOption(tailOptions, config.tail).priceDelta
-    },
-    {
-      label: "Accessory",
-      value: findOption(accessoryOptions, config.accessory).name,
-      price: findOption(accessoryOptions, config.accessory).priceDelta
-    }
-  ];
-
-  return (
-    <div className="review">
-      <div>
-        <p className="eyebrow">Review</p>
-        <h2>Your avatar is ready</h2>
-        <p className="muted">
-          Check the details below before purchasing.
-        </p>
-      </div>
-      <div className="review-table">
-        {rows.map((row) => (
-          <div key={row.label} className="review-row">
-            <span>{row.label}</span>
-            <span className="muted">{row.value}</span>
-            <span>{row.price ? `+${currency(row.price)}` : "Included"}</span>
-          </div>
-        ))}
-        <div className="review-row total">
-          <span>Total</span>
-          <span />
-          <strong>{currency(totalPrice)}</strong>
-        </div>
-      </div>
     </div>
   );
 }
