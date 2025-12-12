@@ -20,7 +20,9 @@ type CustomizeProps = {
   formatCurrency: (value: number) => string;
 };
 
-type OptionChipProps<T extends { id: string; name: string } & Partial<PricedOption>> = {
+type OptionChipProps<
+  T extends { id: string; name: string } & Partial<PricedOption>
+> = {
   options: T[];
   activeId: string;
   onSelect: (id: string) => void;
@@ -33,22 +35,43 @@ function OptionChips<T extends { id: string; name: string } & Partial<PricedOpti
   onSelect,
   formatCurrency
 }: OptionChipProps<T>) {
+  const activeIndex = Math.max(
+    0,
+    options.findIndex((opt) => opt.id === activeId)
+  );
+  const goToIndex = (index: number) => {
+    const next = options[(index + options.length) % options.length];
+    onSelect(next.id);
+  };
+  const current = options[activeIndex];
+  const priceText =
+    "priceDelta" in current && current.priceDelta
+      ? `+${formatCurrency(current.priceDelta)}`
+      : "Included";
+
   return (
-    <div className="chips">
-      {options.map((opt) => (
-        <button
-          key={opt.id}
-          className={`chip ${activeId === opt.id ? "chip-active" : ""}`}
-          onClick={() => onSelect(opt.id)}
-        >
-          <span>{opt.name}</span>
-          {"priceDelta" in opt &&
-            opt.priceDelta !== undefined &&
-            opt.priceDelta > 0 && (
-              <span className="chip-price">+{formatCurrency(opt.priceDelta)}</span>
-            )}
-        </button>
-      ))}
+    <div className="carousel">
+      <button
+        className="carousel-btn"
+        aria-label="Previous option"
+        onClick={() => goToIndex(activeIndex - 1)}
+      >
+        ‹
+      </button>
+
+      <div className="carousel-body">
+        <p className="eyebrow small">Selected</p>
+        <div className="carousel-name">{current.name}</div>
+        <span className="carousel-price">{priceText}</span>
+      </div>
+
+      <button
+        className="carousel-btn"
+        aria-label="Next option"
+        onClick={() => goToIndex(activeIndex + 1)}
+      >
+        ›
+      </button>
     </div>
   );
 }

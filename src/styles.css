@@ -222,26 +222,58 @@ h3 {
   flex-wrap: wrap;
 }
 
-.chip {
+.carousel {
   border: 1px solid var(--border);
   background: #121b2f;
-  color: var(--text);
-  border-radius: 12px;
-  padding: 10px 12px;
-  cursor: pointer;
-  display: inline-flex;
+  border-radius: 14px;
+  padding: 12px;
+  display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
-.chip-active {
+.carousel-body {
+  flex: 1;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.carousel-name {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.carousel-price {
+  color: var(--muted);
+}
+
+.carousel-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #0f172a;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 18px;
+  display: grid;
+  place-items: center;
+  transition: border 0.1s ease, color 0.1s ease, transform 0.1s ease;
+}
+
+.carousel-btn:hover {
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px #0ea5e920;
+  color: var(--primary);
+  transform: translateY(-1px);
 }
 
-.chip-price {
-  color: var(--primary);
-  font-size: 12px;
+.eyebrow.small {
+  font-size: 10px;
+  margin-bottom: 0;
+  color: var(--muted);
 }
 
 .avatar-canvas {
