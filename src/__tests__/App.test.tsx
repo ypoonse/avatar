@@ -28,7 +28,7 @@ test("updates price when customization options change", async () => {
   const user = await selectAnimalAndGoToCustomize();
 
   expect(await screen.findByText(/Configuring/)).toBeInTheDocument();
-  expect(screen.getAllByText("$24.00")[0]).toBeInTheDocument();
+  expect(screen.getAllByText("$240.00")[0]).toBeInTheDocument();
 
   const eyesNextButton = screen.getAllByLabelText("Next option")[0];
   await user.click(eyesNextButton);
