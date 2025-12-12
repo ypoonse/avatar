@@ -195,25 +195,48 @@ function App() {
           <p className="eyebrow">Avatar Market</p>
           <h1>Build and preview your creature</h1>
         </div>
-        <div className="stepper">
-          {(["choose", "customize", "review"] as Step[]).map((item, index) => (
-            <div key={item} className="step">
-              <div
-                className={`step-circle ${
-                  step === item ? "active" : index < (["choose","customize","review"] as Step[]).indexOf(step) ? "done" : ""
-                }`}
-              >
-                {index + 1}
+        <div className="header-nav">
+          <div className="stepper">
+            {(["choose", "customize", "review"] as Step[]).map((item, index) => (
+              <div key={item} className="step">
+                <div
+                  className={`step-circle ${
+                    step === item ? "active" : index < (["choose","customize","review"] as Step[]).indexOf(step) ? "done" : ""
+                  }`}
+                >
+                  {index + 1}
+                </div>
+                <span className="step-label">
+                  {item === "choose"
+                    ? "Choose animal"
+                    : item === "customize"
+                    ? "Customize"
+                    : "Review"}
+                </span>
               </div>
-              <span className="step-label">
-                {item === "choose"
-                  ? "Choose animal"
-                  : item === "customize"
-                  ? "Customize"
-                  : "Review"}
-              </span>
-            </div>
-          ))}
+            ))}
+          </div>
+          <div className="nav-buttons">
+            <button
+              className="ghost"
+              onClick={goBack}
+              disabled={step === "choose"}
+            >
+              Back
+            </button>
+            {step !== "review" && (
+              <button
+                className="primary"
+                onClick={goNext}
+                disabled={!selectedAnimal}
+              >
+                {step === "choose" ? "Customize" : "Review"}
+              </button>
+            )}
+            {step === "review" && (
+              <button className="success" onClick={handleBuyNow}>Buy now</button>
+            )}
+          </div>
         </div>
       </header>
 
@@ -280,30 +303,6 @@ function App() {
           </div>
         </aside>
       </main>
-
-      <footer className="app-footer">
-        <div className="footer-buttons">
-          <button
-            className="ghost"
-            onClick={goBack}
-            disabled={step === "choose"}
-          >
-            Back
-          </button>
-          {step !== "review" && (
-            <button
-              className="primary"
-              onClick={goNext}
-              disabled={!selectedAnimal}
-            >
-              {step === "choose" ? "Customize" : "Review"}
-            </button>
-          )}
-          {step === "review" && (
-            <button className="success" onClick={handleBuyNow}>Buy now</button>
-          )}
-        </div>
-      </footer>
 
       {showSuccessModal && (
         <SuccessModal onClose={handleCloseModal} />
