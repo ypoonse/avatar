@@ -16,7 +16,7 @@ const animals: AnimalOption[] = [
     id: "fox",
     name: "Arctic Fox",
     description: "Quick, curious, and clever.",
-    basePrice: 24,
+    basePrice: 240,
     accent: "#ff9f43",
     emoji: "🦊"
   },
@@ -24,7 +24,7 @@ const animals: AnimalOption[] = [
     id: "bear",
     name: "Forest Bear",
     description: "Steady, calm, and strong.",
-    basePrice: 28,
+    basePrice: 280,
     accent: "#795548",
     emoji: "🐻"
   },
@@ -32,7 +32,7 @@ const animals: AnimalOption[] = [
     id: "cat",
     name: "Midnight Cat",
     description: "Agile, playful, and bright-eyed.",
-    basePrice: 22,
+    basePrice: 220,
     accent: "#673ab7",
     emoji: "🐱"
   },
@@ -40,7 +40,7 @@ const animals: AnimalOption[] = [
     id: "panda",
     name: "Zen Panda",
     description: "Calm focus with playful spirit.",
-    basePrice: 26,
+    basePrice: 260,
     accent: "#b0bec5",
     emoji: "🐼"
   },
@@ -48,7 +48,7 @@ const animals: AnimalOption[] = [
     id: "wolf",
     name: "Lunar Wolf",
     description: "Loyal, swift, and determined.",
-    basePrice: 27,
+    basePrice: 270,
     accent: "#90caf9",
     emoji: "🐺"
   },
@@ -56,7 +56,7 @@ const animals: AnimalOption[] = [
     id: "dragon",
     name: "Sky Dragon",
     description: "Majestic, bold, and legendary.",
-    basePrice: 32,
+    basePrice: 320,
     accent: "#ef5350",
     emoji: "🐉"
   },
@@ -64,7 +64,7 @@ const animals: AnimalOption[] = [
     id: "otter",
     name: "River Otter",
     description: "Playful, curious, and always exploring.",
-    basePrice: 23,
+    basePrice: 230,
     accent: "#7dcfb6",
     emoji: "🦦"
   },
@@ -72,7 +72,7 @@ const animals: AnimalOption[] = [
     id: "owl",
     name: "Night Owl",
     description: "Wise, watchful, and serene.",
-    basePrice: 25,
+    basePrice: 250,
     accent: "#c5cae9",
     emoji: "🦉"
   },
@@ -80,7 +80,7 @@ const animals: AnimalOption[] = [
     id: "tiger",
     name: "Ember Tiger",
     description: "Fierce focus with fiery energy.",
-    basePrice: 30,
+    basePrice: 300,
     accent: "#ff7043",
     emoji: "🐯"
   }
@@ -95,27 +95,27 @@ const colorOptions: ColorOption[] = [
 
 const eyesOptions: PricedOption[] = [
   { id: "bright", name: "Bright", priceDelta: 0 },
-  { id: "sleepy", name: "Sleepy", priceDelta: 1 },
-  { id: "mischief", name: "Mischief", priceDelta: 2 }
+  { id: "sleepy", name: "Sleepy", priceDelta: 10 },
+  { id: "mischief", name: "Mischief", priceDelta: 20 }
 ];
 
 const bodyOptions: PricedOption[] = [
   { id: "compact", name: "Compact", priceDelta: 0 },
-  { id: "athletic", name: "Athletic", priceDelta: 2 },
-  { id: "sleek", name: "Sleek", priceDelta: 1 }
+  { id: "athletic", name: "Athletic", priceDelta: 20 },
+  { id: "sleek", name: "Sleek", priceDelta: 10 }
 ];
 
 const tailOptions: PricedOption[] = [
-  { id: "fluffy", name: "Fluffy", priceDelta: 1 },
+  { id: "fluffy", name: "Fluffy", priceDelta: 10 },
   { id: "short", name: "Short", priceDelta: 0 },
-  { id: "long", name: "Long", priceDelta: 2 }
+  { id: "long", name: "Long", priceDelta: 20 }
 ];
 
 const accessoryOptions: PricedOption[] = [
   { id: "none", name: "None", priceDelta: 0 },
-  { id: "scarf", name: "Scarf", priceDelta: 3 },
-  { id: "visor", name: "Visor", priceDelta: 4 },
-  { id: "backpack", name: "Backpack", priceDelta: 5 }
+  { id: "scarf", name: "Scarf", priceDelta: 30 },
+  { id: "visor", name: "Visor", priceDelta: 40 },
+  { id: "backpack", name: "Backpack", priceDelta: 50 }
 ];
 
 const defaultConfig: AvatarConfig = {
@@ -137,6 +137,7 @@ function App() {
   const [configByAnimal, setConfigByAnimal] = useState<
     Record<string, AvatarConfig>
   >({});
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const selectedAnimal =
     animals.find((a) => a.id === selectedAnimalId) ?? null;
@@ -173,6 +174,18 @@ function App() {
   const goBack = () => {
     if (step === "customize") setStep("choose");
     else if (step === "review") setStep("customize");
+  };
+
+  const handleBuyNow = () => {
+    setShowSuccessModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowSuccessModal(false);
+    // Reset application state
+    setStep("choose");
+    setSelectedAnimalId(null);
+    setConfigByAnimal({});
   };
 
   return (
@@ -287,10 +300,14 @@ function App() {
             </button>
           )}
           {step === "review" && (
-            <button className="success">Buy now</button>
+            <button className="success" onClick={handleBuyNow}>Buy now</button>
           )}
         </div>
       </footer>
+
+      {showSuccessModal && (
+        <SuccessModal onClose={handleCloseModal} />
+      )}
     </div>
   );
 }
@@ -339,6 +356,42 @@ function PriceLine({ label, value }: { label: string; value: number }) {
     <div className="price-line">
       <span>{label}</span>
       <span>{currency(value)}</span>
+    </div>
+  );
+}
+
+type SuccessModalProps = {
+  onClose: () => void;
+};
+
+function SuccessModal({ onClose }: SuccessModalProps) {
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="success-check">
+          <svg
+            width="120"
+            height="120"
+            viewBox="0 0 120 120"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle cx="60" cy="60" r="60" fill="#34d399" />
+            <path
+              d="M35 60 L52 77 L85 44"
+              stroke="#0b1225"
+              strokeWidth="8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+        <h2>Purchase Complete!</h2>
+        <p className="muted">Your avatar has been purchased successfully.</p>
+        <button className="primary" onClick={onClose}>
+          Close
+        </button>
+      </div>
     </div>
   );
 }

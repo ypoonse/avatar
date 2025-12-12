@@ -33,7 +33,7 @@ test("updates price when customization options change", async () => {
   const eyesNextButton = screen.getAllByLabelText("Next option")[0];
   await user.click(eyesNextButton);
 
-  expect(screen.getAllByText("$26.00")[0]).toBeInTheDocument();
+  expect(screen.getAllByText("$260.00")[0]).toBeInTheDocument();
 });
 
 test("review screen shows chosen options and total", async () => {
@@ -48,6 +48,6 @@ test("review screen shows chosen options and total", async () => {
   expect(screen.getByText("Sleepy")).toBeInTheDocument();
   screen.debug();
   screen.logTestingPlaygroundURL();
-  expect(screen.getAllByText("$26.00")[0]).toBeInTheDocument();
+  expect(screen.getAllByText("$260.00")[0]).toBeInTheDocument();
 });
 
